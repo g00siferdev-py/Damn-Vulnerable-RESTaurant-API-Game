@@ -1,13 +1,12 @@
 import os
 import random
+from enum import Enum
 from pathlib import Path
-from typing import Optional
 
 from dotenv import load_dotenv
 
 env_path = Path(".") / ".env"
 load_dotenv(dotenv_path=env_path)
-from enum import Enum
 
 
 class ENV(Enum):
@@ -31,9 +30,11 @@ class Settings:
 
     # JWT signatures must be verified by default. Never accept unsigned
     # or tampered tokens in production.
-    JWT_VERIFY_SIGNATURE: bool = os.getenv(
-        "JWT_VERIFY_SIGNATURE", "True"
-    ).lower() in ("true", "1", "yes")
+    JWT_VERIFY_SIGNATURE: bool = os.getenv("JWT_VERIFY_SIGNATURE", "True").lower() in (
+        "true",
+        "1",
+        "yes",
+    )
 
     POSTGRES_USER: str = os.getenv("POSTGRES_USER", "admin")
     # Do not ship with a hardcoded fallback database password. The
