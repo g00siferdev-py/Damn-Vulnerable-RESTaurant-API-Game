@@ -1,3 +1,11 @@
+> **⚠️ This is a patched/hardened fork of [Damn Vulnerable RESTaurant API Game](https://github.com/theowni/Damn-Vulnerable-RESTaurant-API-Game).**
+>
+> This repository was created by **[@g00siferdev-py](https://github.com/g00siferdev-py)** as a proof-of-work submission for the [Hall of Fame](HALL_OF_FAME.md). All identified vulnerabilities have been remediated.
+>
+> If you are looking for the original vulnerable CTF environment, use the upstream repository linked above.
+
+---
+
 *For theoretical materials, quizzes, vulnerability descriptions, walkthroughs with practical challenges, I recommend my project [API Security Champion](https://app.apisecuritychampion.com/?utm_source=github&utm_medium=dvr_readme).*
 
 ---
