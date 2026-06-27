@@ -10,7 +10,9 @@ from typing_extensions import Annotated
 
 SECRET_KEY = Settings.JWT_SECRET_KEY
 ALGORITHM = "HS256"
-VERIFY_SIGNATURE = False
+# Always verify JWT signatures. Tokens that are not signed with the
+# configured secret key must be rejected.
+VERIFY_SIGNATURE = True
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

@@ -1,11 +1,14 @@
 import secrets
 import string
 
-from apis.auth.utils import update_user_password
+from apis.auth.utils import RolesBasedAuthChecker, get_current_user
+from apis.auth.utils.utils import update_user_password
 from config import settings
+from db.models import User, UserRole
 from db.session import get_db
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
+from typing_extensions import Annotated
 
 router = APIRouter()
 
@@ -18,19 +21,12 @@ router = APIRouter()
     status_code=status.HTTP_200_OK,
 )
 def get_reset_chef_password(
-    request: Request,
     db: Session = Depends(get_db),
+    current_user: Annotated[User, Depends(get_current_user)] = None,
+    auth=Depends(RolesBasedAuthChecker([UserRole.CHEF])),
 ):
-    client_host = request.client.host
-
-    # Only requests from the same machine are allowed
-    # This endpoint is available only for Chef who is also our server admin!
-    if client_host != "127.0.0.1":
-        raise HTTPException(
-            status_code=403,
-            detail="Chef password can be reseted only from the local machine!",
-        )
-
+    # The old implementation trusted request.client.host, which is trivially
+    # spoofable via X-Forwarded-For. Require a valid Chef token instead.
     characters = string.ascii_letters + string.digits + "!@#$%^&*()_-+=;:[]"
 
     # generate a random password

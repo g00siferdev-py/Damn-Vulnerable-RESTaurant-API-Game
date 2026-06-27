@@ -29,11 +29,16 @@ class Settings:
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", generate_random_secret())
     CHEF_USERNAME = os.getenv("CHEF_USERNAME", "chef")
 
-    # someone needs to remember to set this variable to True in env variables
-    JWT_VERIFY_SIGNATURE = os.getenv("JWT_VERIFY_SIGNATURE")
+    # JWT signatures must be verified by default. Never accept unsigned
+    # or tampered tokens in production.
+    JWT_VERIFY_SIGNATURE: bool = os.getenv(
+        "JWT_VERIFY_SIGNATURE", "True"
+    ).lower() in ("true", "1", "yes")
 
     POSTGRES_USER: str = os.getenv("POSTGRES_USER", "admin")
-    POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "password")
+    # Do not ship with a hardcoded fallback database password. The
+    # application requires an explicit credential when Postgres is used.
+    POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
     POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER", "localhost")
     POSTGRES_PORT: str = os.getenv("POSTGRES_PORT", 5432)
     POSTGRES_DB: str = os.getenv("POSTGRES_DB", "restaurant")
@@ -54,6 +59,10 @@ class Settings:
     def DATABASE_URL(self) -> str:
         if self.DB_BACKEND == "memory":
             return "sqlite://"
+        if not self.POSTGRES_PASSWORD:
+            raise ValueError(
+                "POSTGRES_PASSWORD environment variable is required when using Postgres backend"
+            )
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
     @property

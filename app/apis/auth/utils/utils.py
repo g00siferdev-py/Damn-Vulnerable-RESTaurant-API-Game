@@ -102,10 +102,19 @@ def create_user_if_not_exists(
 
 def update_user(db, username: str, user):
     db_user = get_user_by_username(db, username)
+    if db_user is None:
+        return None
 
-    for var, value in vars(user).items():
-        if value:
-            setattr(db_user, var, value)
+    # Restrict bulk updates to explicitly allowed fields to prevent
+    # mass-assignment style attacks (e.g. overwriting the password hash).
+    update_data = vars(user)
+    allowed_fields = {"role"}
+    for var, value in update_data.items():
+        if var.startswith("_"):
+            continue
+        if var not in allowed_fields:
+            continue
+        setattr(db_user, var, value)
 
     db.add(db_user)
     db.commit()
